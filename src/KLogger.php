@@ -61,27 +61,6 @@ class KLogger
     const NO_ARGUMENTS = 'KLogger::NO_ARGUMENTS';
 
     /**
-     * Array of aliases for errors
-     * @var array
-     * @author Nester
-     */
-    protected $_errorAliases = array(
-        self::EMERG  => "EMERG",
-        self::ALERT  => "ALERT",
-        self::CRIT   => "CRIT",
-        self::ERR    => "ERROR",
-        self::WARN   => "WARN",
-        self::NOTICE => "NOTICE",
-        self::INFO   => "INFO",
-        self::DEBUG  => "DEBUG",
-    );
-
-    /**
-     * Alias for no error
-     */
-    const DEFAULT_ALIAS = "LOG";
-
-    /**
      * Current status of the log file
      * @var integer
      */
@@ -161,7 +140,7 @@ class KLogger
             }
         }
 
-        if (in_array($logDirectory, self::$instances)) {
+        if (in_array($logDirectory, array_keys(self::$instances))) {
             return self::$instances[$logDirectory];
         }
 
@@ -202,7 +181,7 @@ class KLogger
             return;
         }
 
-        if (($this->_fileHandle = fopen($this->_logFilePath, 'a'))) {
+        if (($this->_fileHandle = fopen($this->_logFilePath, 'a')) && is_resource($this->_fileHandle)) {
             $this->_logStatus = self::STATUS_LOG_OPEN;
             $this->_messageQueue[] = $this->_messages['opensuccess'];
         } else {
@@ -228,7 +207,7 @@ class KLogger
      */
     public function logDebug($line, $args = self::NO_ARGUMENTS)
     {
-        $this->log($line, self::DEBUG);
+        $this->log($line, self::DEBUG, $args);
     }
 
     /**
@@ -404,7 +383,28 @@ class KLogger
     private function _getTimeLine($level)
     {
         $time = date(self::$_dateFormat);
-        $errorAlias = isset($this->_errorAliases[$level]) ? $this->_errorAliases[$level] : self::DEFAULT_ALIAS;
-        return "$time - $errorAlias -->";
+
+        switch ($level) {
+            case self::EMERG:
+                return "$time - EMERG -->";
+            case self::ALERT:
+                return "$time - ALERT -->";
+            case self::CRIT:
+                return "$time - CRIT -->";
+            case self::FATAL: # FATAL is an alias of CRIT
+                return "$time - FATAL -->";
+            case self::NOTICE:
+                return "$time - NOTICE -->";
+            case self::INFO:
+                return "$time - INFO -->";
+            case self::WARN:
+                return "$time - WARN -->";
+            case self::DEBUG:
+                return "$time - DEBUG -->";
+            case self::ERR:
+                return "$time - ERROR -->";
+            default:
+                return "$time - LOG -->";
+        }
     }
 }
