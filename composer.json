@@ -1,0 +1,19 @@
+{
+    "name": "infinityweb/k-logger",
+    "description": "A Simple Logging Class For PHP",
+    "authors": [
+        {
+            "name": "katzgrau",
+        },
+        {
+            "name": "cwill747",
+        },
+        {
+            "name": "InfinityWebMe",
+            "email": "contact@infinityweb.me"
+        }
+    ],
+    "require": {
+
+    }
+}
