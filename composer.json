@@ -15,5 +15,8 @@
     ],
     "require": {
 
-    }
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    }    
 }
