@@ -378,7 +378,7 @@ class KLogger
             
             if($args !== self::NO_ARGUMENTS) {
                 /* Print the passed object value */
-                $line = $line . '; ' . var_export($args, true);
+                $line = $line . '; ' . $this->_var_export($args);
             }
             
             $this->writeFreeFormLine($line . PHP_EOL);
@@ -406,5 +406,14 @@ class KLogger
         $time = date(self::$_dateFormat);
         $errorAlias = isset($this->_errorAliases[$level]) ? $this->_errorAliases[$level] : self::DEFAULT_ALIAS;
         return "$time - $errorAlias -->";
+    }
+    
+    private function _var_export($expression) {
+        
+        ob_start();
+        var_dump($expression);
+        $content = ob_get_clean();
+        
+        return $content;
     }
 }
