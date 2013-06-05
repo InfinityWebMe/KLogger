@@ -414,6 +414,6 @@ class KLogger
         var_dump($expression);
         $content = ob_get_clean();
         
-        return $content;
+        return htmlspecialchars_decode(strip_tags($content));
     }
 }
