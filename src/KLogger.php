@@ -60,6 +60,12 @@ class KLogger
 	 */
 	const NO_ARGUMENTS = 'KLogger::NO_ARGUMENTS';
 
+
+	/**
+	 * Seperator used between log severity and message in the logs
+	 */
+	const SEPERATOR = '-->';
+
 	/**
 	 * Array of aliases for errors
 	 * @var array
@@ -415,7 +421,7 @@ class KLogger
 	{
 		$time = date(self::$_dateFormat);
 		$errorAlias = isset($this->_errorAliases[$level]) ? $this->_errorAliases[$level] : self::DEFAULT_ALIAS;
-		return "$time - $errorAlias -->";
+		return "$time - $errorAlias " . self::SEPERATOR;
 	}
 
 	private function _var_export($expression)
