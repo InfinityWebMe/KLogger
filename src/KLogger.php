@@ -156,9 +156,10 @@ class KLogger {
 	 *
 	 * @param string  $logDirectory File path to the logging directory
 	 * @param integer $severity     One of the pre-defined severity constants
+	 * @param string  $logName		Name the log
 	 * @return KLogger
 	 */
-	public static function instance($logDirectory = false, $severity = false)
+	public static function instance($logDirectory = false, $severity = false, $logName = null)
 	{
 		if ($severity === false)
 		{
@@ -182,7 +183,7 @@ class KLogger {
 			return self::$instances[$logDirectory];
 		}
 
-		self::$instances[$logDirectory] = new self($logDirectory, $severity);
+		self::$instances[$logDirectory] = new self($logDirectory, $severity, $logName);
 
 		return self::$instances[$logDirectory];
 	}
@@ -192,9 +193,10 @@ class KLogger {
 	 *
 	 * @param string  $logDirectory File path to the logging directory
 	 * @param integer $severity     One of the pre-defined severity constants
+	 * @param string  $logName		Name the log
 	 * @return void
 	 */
-	public function __construct($logDirectory, $severity)
+	public function __construct($logDirectory, $severity, $logName = null)
 	{
 		$logDirectory = rtrim($logDirectory, '\\/');
 
@@ -205,9 +207,9 @@ class KLogger {
 
 		$this->_logFilePath = $logDirectory
 				. DIRECTORY_SEPARATOR
-				. 'log_'
+				. (!empty($logName) ? "{$logName}_" : 'log_')
 				. date('Y-m-d')
-				. '.txt';
+				. '.log';
 
 		$this->_severityThreshold = $severity;
 		if (!file_exists($logDirectory))
@@ -249,6 +251,7 @@ class KLogger {
 	 * Writes a $line to the log with a severity level of DEBUG
 	 *
 	 * @param string $line Information to log
+	 * @param (string|object|array) $args arguments	 
 	 * @return void
 	 */
 	public function logDebug($line, $args = self::NO_ARGUMENTS)
@@ -298,6 +301,7 @@ class KLogger {
 	 * can be used here, or it could be used with E_STRICT errors
 	 *
 	 * @param string $line Information to log
+	 * @param (string|object|array) $args arguments
 	 * @return void
 	 */
 	public function logInfo($line, $args = self::NO_ARGUMENTS)
@@ -310,6 +314,7 @@ class KLogger {
 	 * corresponds to E_STRICT, E_NOTICE, or E_USER_NOTICE errors
 	 *
 	 * @param string $line Information to log
+	 * @param (string|object|array) $args arguments
 	 * @return void
 	 */
 	public function logNotice($line, $args = self::NO_ARGUMENTS)
@@ -323,6 +328,7 @@ class KLogger {
 	 * E_COMPILE_WARNING
 	 *
 	 * @param string $line Information to log
+	 * @param (string|object|array) $args arguments
 	 * @return void
 	 */
 	public function logWarn($line, $args = self::NO_ARGUMENTS)
@@ -335,6 +341,7 @@ class KLogger {
 	 * with E_RECOVERABLE_ERROR
 	 *
 	 * @param string $line Information to log
+	 * @param (string|object|array) $args arguments
 	 * @return void
 	 */
 	public function logError($line, $args = self::NO_ARGUMENTS)
@@ -343,22 +350,10 @@ class KLogger {
 	}
 
 	/**
-	 * Writes a $line to the log with a severity level of FATAL. Generally
-	 * corresponds to E_ERROR, E_USER_ERROR, E_CORE_ERROR, or E_COMPILE_ERROR
-	 *
-	 * @param string $line Information to log
-	 * @return void
-	 * @deprecated Use logCrit
-	 */
-	public function logFatal($line, $args = self::NO_ARGUMENTS)
-	{
-		$this->log($line, self::FATAL, $args);
-	}
-
-	/**
 	 * Writes a $line to the log with a severity level of ALERT.
 	 *
 	 * @param string $line Information to log
+	 * @param (string|object|array) $args arguments
 	 * @return void
 	 */
 	public function logAlert($line, $args = self::NO_ARGUMENTS)
@@ -370,6 +365,7 @@ class KLogger {
 	 * Writes a $line to the log with a severity level of CRIT.
 	 *
 	 * @param string $line Information to log
+	 * @param (string|object|array) $args arguments
 	 * @return void
 	 */
 	public function logCrit($line, $args = self::NO_ARGUMENTS)
@@ -381,6 +377,7 @@ class KLogger {
 	 * Writes a $line to the log with a severity level of EMERG.
 	 *
 	 * @param string $line Information to log
+	 * @param (string|object|array) $args arguments
 	 * @return void
 	 */
 	public function logEmerg($line, $args = self::NO_ARGUMENTS)
@@ -392,15 +389,14 @@ class KLogger {
 	 * Writes a $line to the log with the given severity
 	 *
 	 * @param string  $line     Text to add to the log
-	 * @param integer $severity Severity level of log message (use constants)
+	 * @param int $severity Severity level of log message (use constants)
+	 * @param (string|object|array) $args arguments
 	 */
 	public function log($line, $severity, $args = self::NO_ARGUMENTS)
 	{
 		if ($this->_severityThreshold >= $severity)
 		{
-			$status = $this->_getTimeLine($severity);
-
-			$line = "$status $line";
+			$line = $this->_getTimeLine($severity) . " $line";
 
 			if ($args !== self::NO_ARGUMENTS)
 			{
@@ -437,14 +433,11 @@ class KLogger {
 
 	private function _getTimeLine($level)
 	{
-		$time = date(self::$_dateFormat);
-		$errorAlias = isset($this->_errorAliases[$level]) ? $this->_errorAliases[$level] : self::DEFAULT_ALIAS;
-		return "$time - $errorAlias " . self::SEPERATOR;
+		return date(self::$_dateFormat) . " - " . isset($this->_errorAliases[$level]) ? $this->_errorAliases[$level] : self::DEFAULT_ALIAS . " " . self::SEPERATOR;
 	}
 
 	private function _var_export($expression)
 	{
-
 		ob_start();
 		var_dump($expression);
 		$content = ob_get_clean();
