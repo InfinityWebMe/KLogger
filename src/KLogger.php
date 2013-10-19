@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Finally, a light, permissions-checking logging class.
  *
@@ -20,8 +19,8 @@
 /**
  * Class documentation
  */
-class KLogger
-{
+class KLogger {
+
 	/**
 	 * Error severity, from low to high. From BSD syslog RFC, section 4.1.1
 	 * @link http://www.faqs.org/rfcs/rfc3164.html
@@ -72,16 +71,15 @@ class KLogger
 	 * @author Nester
 	 */
 	protected $_errorAliases = array(
-		self::EMERG	 => "EMERG",
-		self::ALERT	 => "ALERT",
-		self::CRIT	 => "CRIT",
-		self::ERR	 => "ERROR",
-		self::WARN	 => "WARN",
+		self::EMERG => "EMERG",
+		self::ALERT => "ALERT",
+		self::CRIT => "CRIT",
+		self::ERR => "ERROR",
+		self::WARN => "WARN",
 		self::NOTICE => "NOTICE",
-		self::INFO	 => "INFO",
-		self::DEBUG	 => "DEBUG",
+		self::INFO => "INFO",
+		self::DEBUG => "DEBUG",
 	);
-
 	/**
 	 * Alias for no error
 	 */
@@ -123,9 +121,9 @@ class KLogger
 	 * @var array
 	 */
 	private $_messages = array(
-		'writefail'		 => 'The file could not be written to. Check that appropriate permissions have been set.',
-		'opensuccess'	 => 'The log file was opened successfully.',
-		'openfail'		 => 'The file could not be opened. Check permissions.',
+		'writefail' => 'The file could not be written to. Check that appropriate permissions have been set.',
+		'opensuccess' => 'The log file was opened successfully.',
+		'openfail' => 'The file could not be opened. Check permissions.',
 	);
 
 	/**
@@ -162,20 +160,25 @@ class KLogger
 	 */
 	public static function instance($logDirectory = false, $severity = false)
 	{
-		if ($severity === false) {
+		if ($severity === false)
+		{
 			$severity = self::$_defaultSeverity;
 		}
 
-		if ($logDirectory === false) {
-			if (count(self::$instances) > 0) {
+		if ($logDirectory === false)
+		{
+			if (count(self::$instances) > 0)
+			{
 				return current(self::$instances);
 			}
-			else {
+			else
+			{
 				$logDirectory = dirname(__FILE__);
 			}
 		}
 
-		if (in_array($logDirectory, array_keys(self::$instances))) {
+		if (in_array($logDirectory, array_keys(self::$instances)))
+		{
 			return self::$instances[$logDirectory];
 		}
 
@@ -195,7 +198,8 @@ class KLogger
 	{
 		$logDirectory = rtrim($logDirectory, '\\/');
 
-		if ($severity === self::OFF) {
+		if ($severity === self::OFF)
+		{
 			return;
 		}
 
@@ -206,21 +210,25 @@ class KLogger
 				. '.txt';
 
 		$this->_severityThreshold = $severity;
-		if (!file_exists($logDirectory)) {
+		if (!file_exists($logDirectory))
+		{
 			mkdir($logDirectory, self::$_defaultPermissions, true);
 		}
 
-		if (file_exists($this->_logFilePath) && !is_writable($this->_logFilePath)) {
+		if (file_exists($this->_logFilePath) && !is_writable($this->_logFilePath))
+		{
 			$this->_logStatus = self::STATUS_OPEN_FAILED;
 			$this->_messageQueue[] = $this->_messages['writefail'];
 			return;
 		}
 
-		if (($this->_fileHandle = fopen($this->_logFilePath, 'a')) && is_resource($this->_fileHandle)) {
+		if (($this->_fileHandle = fopen($this->_logFilePath, 'a')) && is_resource($this->_fileHandle))
+		{
 			$this->_logStatus = self::STATUS_LOG_OPEN;
 			$this->_messageQueue[] = $this->_messages['opensuccess'];
 		}
-		else {
+		else
+		{
 			$this->_logStatus = self::STATUS_OPEN_FAILED;
 			$this->_messageQueue[] = $this->_messages['openfail'];
 		}
@@ -231,7 +239,8 @@ class KLogger
 	 */
 	public function __destruct()
 	{
-		if ($this->_fileHandle) {
+		if ($this->_fileHandle)
+		{
 			fclose($this->_fileHandle);
 		}
 	}
@@ -387,16 +396,20 @@ class KLogger
 	 */
 	public function log($line, $severity, $args = self::NO_ARGUMENTS)
 	{
-		if ($this->_severityThreshold >= $severity) {
+		if ($this->_severityThreshold >= $severity)
+		{
 			$status = $this->_getTimeLine($severity);
 
 			$line = "$status $line";
 
-			if ($args !== self::NO_ARGUMENTS) {
-				if (is_array($args) OR is_object($args)) {
+			if ($args !== self::NO_ARGUMENTS)
+			{
+				if (is_array($args) OR is_object($args))
+				{
 					$line .= '; ' . $this->_var_export($args);
 				}
-				else {
+				else
+				{
 					$line .= $args;
 				}
 			}
@@ -413,8 +426,10 @@ class KLogger
 	 */
 	public function writeFreeFormLine($line)
 	{
-		if ($this->_logStatus == self::STATUS_LOG_OPEN && $this->_severityThreshold != self::OFF) {
-			if (fwrite($this->_fileHandle, $line) === false) {
+		if ($this->_logStatus == self::STATUS_LOG_OPEN && $this->_severityThreshold != self::OFF)
+		{
+			if (fwrite($this->_fileHandle, $line) === false)
+			{
 				$this->_messageQueue[] = $this->_messages['writefail'];
 			}
 		}
