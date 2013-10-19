@@ -394,8 +394,12 @@ class KLogger
 			$line = "$status $line";
 
 			if ($args !== self::NO_ARGUMENTS) {
-				/* Print the passed object value */
-				$line = $line . '; ' . $this->_var_export($args);
+				if (is_array($args) OR is_object($args)) {
+					$line .= '; ' . $this->_var_export($args);
+				}
+				else {
+					$line .= $args;
+				}
 			}
 
 			$this->writeFreeFormLine($line . PHP_EOL);
