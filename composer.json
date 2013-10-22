@@ -9,5 +9,8 @@
 			"name": "InfinityWebMe",
 			"email": "contact@infinityweb.me"
 		}
-	]
+	],
+	"autoload": {
+		"classmap": ["KLogger.php"]
+	},
 }
