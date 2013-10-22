@@ -12,5 +12,5 @@
 	],
 	"autoload": {
 		"classmap": ["KLogger.php"]
-	},
+	}
 }
