@@ -433,7 +433,7 @@ class KLogger {
 
 	private function _getTimeLine($level)
 	{
-		return date(self::$_dateFormat) . " - " . isset($this->_errorAliases[$level]) ? $this->_errorAliases[$level] : self::DEFAULT_ALIAS . " " . self::SEPERATOR;
+		return date(self::$_dateFormat) . " - " . (isset($this->_errorAliases[$level]) ? $this->_errorAliases[$level] : self::DEFAULT_ALIAS . " " . self::SEPERATOR);
 	}
 
 	private function _var_export($expression)
